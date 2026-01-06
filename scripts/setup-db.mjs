@@ -10,7 +10,8 @@ import { pool } from "../src/config/db.js";
 
 const files = [
   path.resolve(__dirname, "../../db/001_schema.sql"),
-  path.resolve(__dirname, "../../db/002_seed.sql")
+  path.resolve(__dirname, "../../db/002_seed.sql"),
+  path.resolve(__dirname, "../../db/003_add_flex_mode.sql")
 ];
 
 async function runSqlFile(filePath) {
@@ -24,7 +25,8 @@ async function runSqlFile(filePath) {
     try {
       await pool.query(statement);
     } catch (err) {
-      if (err.code === "ER_DB_CREATE_EXISTS" || err.code === "ER_TABLE_EXISTS_ERROR") continue;
+  if (err.code === "ER_DB_CREATE_EXISTS" || err.code === "ER_TABLE_EXISTS_ERROR") continue;
+  if (err.code === "ER_DUP_ENTRY") continue;
       if (err.code === "ER_BAD_FIELD_ERROR") {
         console.warn(`Skipping statement due to column mismatch: ${err.message}`);
         continue;

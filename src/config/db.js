@@ -1,7 +1,11 @@
 import mysql from "mysql2/promise";
 import dotenv from "dotenv";
+import path from "path";
+import url from "url";
 
-dotenv.config();
+// Load .env from the backend folder regardless of current working directory
+const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
+dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 
 export const pool = mysql.createPool({
   host: process.env.DB_HOST,

@@ -437,7 +437,7 @@ export async function applyAutoRulesForDay(userId, dayDateStr) {
 
 export async function getEmployeeDaySummary(userId, dayDateStr) {
   const [[userRow]] = await pool.query(
-    "SELECT id,email,role,name FROM users WHERE id=? LIMIT 1",
+    "SELECT id,email,role,full_name FROM users WHERE id=? LIMIT 1",
     [userId]
   );
 
@@ -446,8 +446,8 @@ export async function getEmployeeDaySummary(userId, dayDateStr) {
         id: userRow.id,
         email: userRow.email,
         role: userRow.role,
-        name: userRow.name,
-        full_name: userRow.name || userRow.email
+        name: userRow.full_name || userRow.email,
+        full_name: userRow.full_name || userRow.email
       }
     : {
         id: userId,

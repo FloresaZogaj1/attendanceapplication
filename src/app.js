@@ -10,7 +10,25 @@ import adminRoutes from "./routes/admin.routes.js";
 
 const app = express();
 
-app.use(cors({ origin: true, credentials: true }));
+// CORS: allow production domain and localhost for development
+const allowedOrigins = [
+	"http://localhost:5173",
+	"http://localhost:5050", // backend local health/testing
+	"https://puna.illyrian.marketing",
+];
+
+app.use(
+	cors({
+		origin: function (origin, callback) {
+			// Allow server-to-server or non-origin requests
+			if (!origin) return callback(null, true);
+			if (allowedOrigins.includes(origin)) return callback(null, true);
+			// Also allow subdomain variations if needed in future
+			return callback(new Error("Not allowed by CORS"));
+		},
+		credentials: true,
+	})
+);
 app.use(express.json());
 
 app.get("/health", (_, res) => res.json({ ok: true }));

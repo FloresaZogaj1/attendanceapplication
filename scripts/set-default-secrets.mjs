@@ -8,6 +8,16 @@ dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 import { pool } from "../src/config/db.js";
 
+async function ensureUserExists(full_name, email) {
+  const [rows] = await pool.query("SELECT id FROM users WHERE email=? LIMIT 1", [email]);
+  if (rows.length) return rows[0].id;
+  const [res] = await pool.query(
+    "INSERT INTO users(full_name,email,password_hash,role,is_active) VALUES(?,?,?,?,1)",
+    [full_name, email, "$2b$10$PLACEHOLDER", "EMPLOYEE"]
+  );
+  return res.insertId;
+}
+
 async function setSecretsByEmail(email, password, pin) {
   const updates = [];
   const values = [];
@@ -18,7 +28,7 @@ async function setSecretsByEmail(email, password, pin) {
   }
   if (pin) {
     const hash = await bcrypt.hash(String(pin), 10);
-    updates.push("pin_hash=?");
+    updates.push("pin_hash=?", "pin_enabled=1");
     values.push(hash);
   }
   values.push(email);
@@ -33,6 +43,8 @@ async function run() {
   // Ensure desired records are active by email
   await ensureEmployeeActiveByEmail("rakovicaberat@gmail.com");
   await ensureEmployeeActiveByEmail("kimibishiphotography@gmail.com");
+  await ensureUserExists("Eriona Kqiku", "erionakqiu@gmail.com");
+  await ensureUserExists("Suela Nallbani", "suela.nallbania@gmail.com");
   await ensureEmployeeActiveByEmail("erionakqiu@gmail.com");
   await ensureEmployeeActiveByEmail("suela.nallbania@gmail.com");
   // If Murati email differs, update below accordingly

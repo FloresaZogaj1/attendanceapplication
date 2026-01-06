@@ -15,6 +15,8 @@ app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 
 app.get("/health", (_, res) => res.json({ ok: true }));
+// Also serve health check under /api prefix to simplify proxy/testing
+app.get("/api/health", (_, res) => res.json({ ok: true }));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/employee", employeeRoutes);
